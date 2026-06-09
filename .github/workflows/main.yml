@@ -11,6 +11,11 @@ on:
       - master
   workflow_dispatch:  # Memungkinkan trigger manual dari tab Actions GitHub
 
+# Memberikan izin write kepada GITHUB_TOKEN bawaan GitHub Actions
+# agar workflow dapat melakukan commit & push hasil preprocessing ke repository
+permissions:
+  contents: write
+
 jobs:
   preprocess:
     runs-on: ubuntu-latest
@@ -19,6 +24,9 @@ jobs:
       # ─── 1. Checkout repository ───────────────────────────────────────────
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history agar git push tidak gagal
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       # ─── 2. Setup Python ──────────────────────────────────────────────────
       - name: Setup Python 3.12
@@ -61,9 +69,14 @@ jobs:
       # Langkah ini memastikan dataset terbaru hasil preprocessing
       # tersimpan kembali di repository (sesuai kriteria "mengembalikan dataset terbaru")
       - name: Commit preprocessed datasets to repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name  "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Set remote URL dengan token agar push terotentikasi
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
 
           git add preprocessing/country_vaccinations_preprocessed.csv \
                   preprocessing/country_vaccinations_train.csv \
@@ -74,11 +87,11 @@ jobs:
             echo "No changes in preprocessed files. Skipping commit."
           else
             git commit -m "chore: update preprocessed datasets [skip ci]"
-            git push
+            # Pull rebase terlebih dahulu agar tidak konflik dengan remote
+            git pull --rebase origin ${{ github.ref_name }}
+            git push origin ${{ github.ref_name }}
             echo "Preprocessed datasets committed and pushed."
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # ─── 7. Upload hasil preprocessing sebagai artifact Actions ───────────
       # Sebagai alternatif/tambahan dari commit ke repo
