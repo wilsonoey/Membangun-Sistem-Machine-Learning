@@ -1,0 +1,93 @@
+name: Preprocessing Pipeline - COVID Vaccination Dataset
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:  # Memungkinkan trigger manual dari tab Actions GitHub
+
+jobs:
+  preprocess:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ─── 1. Checkout repository ───────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ─── 2. Setup Python ──────────────────────────────────────────────────
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # ─── 3. Install dependencies ──────────────────────────────────────────
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas scikit-learn kaggle
+
+      # ─── 4. Download dataset dari Kaggle ──────────────────────────────────
+      # Pastikan sudah menambahkan KAGGLE_USERNAME dan KAGGLE_KEY
+      # di Settings > Secrets and variables > Actions pada repository GitHub
+      - name: Download dataset from Kaggle
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          mkdir -p preprocessing
+          cd preprocessing
+          kaggle datasets download -d gpreda/covid-world-vaccination-progress --unzip
+          echo "Dataset downloaded successfully."
+          ls -lh *.csv
+
+      # ─── 5. Jalankan script preprocessing ────────────────────────────────
+      - name: Run preprocessing script
+        run: |
+          cd preprocessing
+          python automate_Wilson-Jonathan-Oey.py
+          echo "Preprocessing completed."
+          echo "Output files:"
+          ls -lh country_vaccinations_preprocessed.csv \
+                 country_vaccinations_train.csv \
+                 country_vaccinations_test.csv
+
+      # ─── 6. Commit & push hasil preprocessing ke repository ───────────────
+      # Langkah ini memastikan dataset terbaru hasil preprocessing
+      # tersimpan kembali di repository (sesuai kriteria "mengembalikan dataset terbaru")
+      - name: Commit preprocessed datasets to repository
+        run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add preprocessing/country_vaccinations_preprocessed.csv \
+                  preprocessing/country_vaccinations_train.csv \
+                  preprocessing/country_vaccinations_test.csv
+
+          # Hanya commit jika ada perubahan
+          if git diff --staged --quiet; then
+            echo "No changes in preprocessed files. Skipping commit."
+          else
+            git commit -m "chore: update preprocessed datasets [skip ci]"
+            git push
+            echo "Preprocessed datasets committed and pushed."
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ─── 7. Upload hasil preprocessing sebagai artifact Actions ───────────
+      # Sebagai alternatif/tambahan dari commit ke repo
+      - name: Upload preprocessed datasets as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: preprocessed-datasets
+          path: |
+            preprocessing/country_vaccinations_preprocessed.csv
+            preprocessing/country_vaccinations_train.csv
+            preprocessing/country_vaccinations_test.csv
+          retention-days: 30
