@@ -1,0 +1,1 @@
+Grafana alert rule for prediction errors > 5%

@@ -1,0 +1,1 @@
+Grafana metric: prediction_requests_total

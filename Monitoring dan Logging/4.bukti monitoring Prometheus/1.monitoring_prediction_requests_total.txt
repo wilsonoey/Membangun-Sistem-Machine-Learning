@@ -1,0 +1,1 @@
+Prometheus query: prediction_requests_total

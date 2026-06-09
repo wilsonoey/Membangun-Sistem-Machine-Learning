@@ -1,0 +1,1 @@
+Grafana metric: flask_uptime_seconds
