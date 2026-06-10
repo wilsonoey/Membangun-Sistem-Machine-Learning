@@ -2,10 +2,8 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-
 import pandas as pd
 import pytest
-
 
 def create_sample_csv(tmp_path: Path) -> Path:
     data = pd.DataFrame(
