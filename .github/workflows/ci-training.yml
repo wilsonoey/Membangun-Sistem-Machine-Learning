@@ -80,7 +80,8 @@ jobs:
             mlflow models build-docker \
               -m Workflow-CI/MLProject/models/latest \
               -n wilsonoey/smsml-model \
-              --enable-mlserver
+              --enable-mlserver \
+              --env-manager local
             echo "Docker image built successfully: wilsonoey/smsml-model"
           else
             echo "⚠ No model found at Workflow-CI/MLProject/models/latest, skipping Docker build."
