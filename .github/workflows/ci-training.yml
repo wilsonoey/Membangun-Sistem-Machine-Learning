@@ -51,10 +51,13 @@ jobs:
 
       # ─── 6. Train model dengan MLflow run ──────────────────────────────────
       - name: Train model with MLflow run
+        env:
+          MLFLOW_TRACKING_URI: sqlite:///mlruns.db
         run: |
           cd Workflow-CI/MLProject
           mlflow run . --env-manager=local \
             --entry-point main \
+            --experiment-name vaccination-basic-experiment \
             -P train_csv=country_vaccinations_train.csv \
             -P test_csv=country_vaccinations_test.csv
 
