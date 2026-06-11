@@ -65,13 +65,19 @@ def main():
     # Configure MLflow - gunakan SQLite agar kompatibel dengan MLflow 3.x
     tracking_uri = args.tracking_uri
     if tracking_uri == "file:./mlruns":
-        tracking_uri = "sqlite:///mlruns.db"
+        tracking_uri = os.environ.get("MLFLOW_TRACKING_URI", "sqlite:///mlruns.db")
     mlflow.set_tracking_uri(tracking_uri)
     mlflow.set_experiment("vaccination-basic-experiment")
 
     # Resolve train/test paths with fallbacks
-    train_fallbacks = ["../preprocessing/country_vaccinations_train.csv"]
-    test_fallbacks = ["../preprocessing/country_vaccinations_test.csv"]
+    train_fallbacks = [
+        "../../country_vaccinations_train.csv",
+        "../preprocessing/country_vaccinations_train.csv",
+    ]
+    test_fallbacks = [
+        "../../country_vaccinations_test.csv",
+        "../preprocessing/country_vaccinations_test.csv",
+    ]
     args.train_csv = _resolve_path(args.train_csv, train_fallbacks)
     args.test_csv = _resolve_path(args.test_csv, test_fallbacks)
 
