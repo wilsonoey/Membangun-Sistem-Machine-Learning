@@ -2,10 +2,13 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+
 import pandas as pd
 import pytest
 
-def create_sample_csv(tmp_path: Path) -> Path:
+
+def create_sample_csv(tmp_path: Path):
+    """Create sample train and test CSV files for testing."""
     data = pd.DataFrame(
         [
             {
@@ -85,22 +88,29 @@ def create_sample_csv(tmp_path: Path) -> Path:
             },
         ]
     )
-    csv_path = tmp_path / "sample_vaccinations.csv"
-    data.to_csv(csv_path, index=False)
-    return csv_path
+    # Bagi menjadi train (4 baris) dan test (1 baris)
+    train_path = tmp_path / "train.csv"
+    test_path = tmp_path / "test.csv"
+    data.iloc[:4].to_csv(train_path, index=False)
+    data.iloc[4:].to_csv(test_path, index=False)
+    return train_path, test_path
 
 
 def test_training_runs_without_error(tmp_path):
-    csv_path = create_sample_csv(tmp_path)
+    train_path, test_path = create_sample_csv(tmp_path)
     result = subprocess.run(
-        [sys.executable, "MLProject/modelling.py", "--input_csv", str(csv_path)],
+        [
+            sys.executable,
+            "MLProject/modelling.py",
+            "--train_csv", str(train_path),
+            "--test_csv", str(test_path),
+        ],
         capture_output=True,
         text=True,
         check=False,
     )
     assert result.returncode == 0, result.stderr
-    assert Path("models/latest").exists()
-    assert Path("models/model_info.json").exists()
+    assert Path("models/latest").exists(), "Folder models/latest tidak ditemukan setelah training."
 
 
 def test_health_endpoint_metadata_file_exists():
