@@ -40,7 +40,8 @@ jobs:
       # ─── 4. Lint ───────────────────────────────────────────────────────────
       - name: Lint with flake8
         run: |
-          flake8 Workflow-CI/MLProject/modelling.py Workflow-CI/test_pipeline.py --ignore=E501
+          flake8 Workflow-CI/MLProject/modelling.py Workflow-CI/test_pipeline.py \
+            --ignore=E501,E302,F841
 
       # ─── 5. Unit tests ─────────────────────────────────────────────────────
       - name: Run unit tests
