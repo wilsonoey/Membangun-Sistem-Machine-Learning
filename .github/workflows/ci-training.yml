@@ -46,7 +46,8 @@ jobs:
       # ─── 5. Unit tests ─────────────────────────────────────────────────────
       - name: Run unit tests
         run: |
-          pytest Workflow-CI/test_pipeline.py -q
+          cd Workflow-CI
+          pytest test_pipeline.py -q
 
       # ─── 6. Train model dengan MLflow run ──────────────────────────────────
       - name: Train model with MLflow run
