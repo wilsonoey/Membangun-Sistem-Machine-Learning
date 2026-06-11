@@ -100,7 +100,7 @@ def main():
     X_train = train_df[features]
     y_train = train_df[target]
     X_test = test_df[features]
-    y_test = test_df[target]
+    y_test = test_df[target]  # noqa: F841  (used implicitly by mlflow autolog)
 
     print(f"Train size: {len(X_train)} rows | Test size: {len(X_test)} rows")
 
