@@ -203,6 +203,9 @@ def main():
         mlflow.sklearn.log_model(best_model, artifact_path="model")
 
         # Save local artifacts
+        import shutil
+        if os.path.exists("models/latest"):
+            shutil.rmtree("models/latest")
         os.makedirs("models/latest", exist_ok=True)
         mlflow.sklearn.save_model(best_model, "models/latest")
 
