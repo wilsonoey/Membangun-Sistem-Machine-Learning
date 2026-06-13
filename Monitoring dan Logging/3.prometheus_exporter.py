@@ -90,6 +90,18 @@ def load_model_and_metadata():
             model_info = json.load(f)
         print("Model metadata loaded successfully.")
 
+@app.route("/", methods=["GET"])
+def index():
+    HTTP_REQUESTS_TOTAL.labels(endpoint="/", method="GET", status="200").inc()
+    return jsonify({
+        "message": "Welcome to the Vaccination Prediction Model API",
+        "endpoints": {
+            "health": "/health [GET]",
+            "metrics": "/metrics [GET]",
+            "predict": "/predict [POST]"
+        }
+    })
+
 @app.route("/health", methods=["GET"])
 def health():
     HTTP_REQUESTS_TOTAL.labels(endpoint="/health", method="GET", status="200").inc()
