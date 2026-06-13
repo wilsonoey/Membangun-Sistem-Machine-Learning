@@ -65,13 +65,17 @@ def load_model_and_metadata():
     
     # Fallback path if models/latest does not exist locally
     actual_model_path = MODEL_PATH
-    if not Path(actual_model_path).exists() and Path("../Membangun_model/models/latest").exists():
+    if not Path(actual_model_path).exists() and Path("../models/latest").exists():
+        actual_model_path = "../models/latest"
+    elif not Path(actual_model_path).exists() and Path("../Membangun_model/models/latest").exists():
         actual_model_path = "../Membangun_model/models/latest"
     elif not Path(actual_model_path).exists() and Path("models/latest").exists():
         actual_model_path = "models/latest"
         
     actual_info_path = MODEL_INFO_PATH
-    if not Path(actual_info_path).exists() and Path("../Membangun_model/models/model_info.json").exists():
+    if not Path(actual_info_path).exists() and Path("../models/model_info.json").exists():
+        actual_info_path = "../models/model_info.json"
+    elif not Path(actual_info_path).exists() and Path("../Membangun_model/models/model_info.json").exists():
         actual_info_path = "../Membangun_model/models/model_info.json"
     elif not Path(actual_info_path).exists() and Path("models/model_info.json").exists():
         actual_info_path = "models/model_info.json"
