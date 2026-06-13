@@ -1,1 +1,0 @@
-Grafana alert rule for prediction latency > 2s

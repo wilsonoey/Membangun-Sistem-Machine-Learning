@@ -1,1 +1,0 @@
-Grafana alert notification for prediction errors sent to Discord/Email/Slack

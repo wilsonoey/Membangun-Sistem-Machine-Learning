@@ -1,1 +1,0 @@
-Grafana alert rule for low traffic (no requests for 5 minutes)
