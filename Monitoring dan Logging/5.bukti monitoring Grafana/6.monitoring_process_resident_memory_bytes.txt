@@ -1,1 +1,0 @@
-Grafana metric: process_resident_memory_bytes

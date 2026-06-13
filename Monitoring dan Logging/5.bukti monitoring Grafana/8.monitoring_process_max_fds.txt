@@ -1,1 +1,0 @@
-Grafana metric: process_max_fds
