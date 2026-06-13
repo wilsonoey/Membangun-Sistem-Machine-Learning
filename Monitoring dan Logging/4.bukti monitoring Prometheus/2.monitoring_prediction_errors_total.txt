@@ -1,1 +1,0 @@
-Prometheus query: prediction_errors_total
